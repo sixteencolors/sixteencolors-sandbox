@@ -79,23 +79,26 @@ $(document).ready(function () {
             url: apiURL,
             dataType: 'jsonp',
             // data: {page: page}, // Page parameter to make sure we load new data
+            success: onLoadPacks
+        });
+    }
+
+    function onLoadPacks(data) {
+        var i = 0;     
+        $.ajax({
+            url: 'http://api.sixteencolors.net/v0/pack/' + data[i].name + '?callback=?',
+            dataType: 'jsonp',
             success: onLoadPack
         });
     }
 
-    function onLoadPack(data) {
-        $.ajax({
-            url: 'http://api.sixteencolors.net/v0/pack/' + data[0].name + '?callback=?',
-            dataType: 'jsonp',
-            success: onLoadData
-        });
-    }
+
 
     /**
      * Receives data from the API, creates HTML for images and updates the layout
      */
 
-    function onLoadData(data) {
+    function onLoadPack(data) {
         isLoading = false;
         $('#loaderCircle').hide();
 
@@ -103,7 +106,7 @@ $(document).ready(function () {
         page++;
 
         // Create HTML for the images.
-        var html = '';
+        var html = '<h1>' + data.name + ', ' + data.year + '</h1><ul class="pack">';
         var i = 0,
             length = data.files.length,
             image;
@@ -116,8 +119,10 @@ $(document).ready(function () {
 
         }
 
+        html += '</ul>';
+
         // Add image HTML to the page.
-        $('#pack_contents ul').append(html);
+        $('#pack_contents').append(html);
 
         // Apply layout.
         applyLayout();
