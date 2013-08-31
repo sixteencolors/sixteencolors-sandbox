@@ -16,11 +16,27 @@ $(document).ready(function () {
         rel: 'lightbox',
         photo: true,
         opacity: 0,
+        height: '100%',
         title: function () {
             return $(this).siblings('label').text();
         }
     });
 
+    $(window).on("resize", function(){
+    //check if colorbox is open. This 'if' is from stackoverflow, I haven't tested
+    if($('#colorbox').length && $('#colorbox').css('display') != 'none') {
+        //replace colorboxID with the correct ID colorbox uses
+        document.getElementById('cboxContent').style.height=$(window).height();
+    }
+});
+
+    // Lock body of page to not scroll
+    
+    $(document).bind('cbox_open', function () {
+        $('html').css({ overflow: 'hidden' });
+    }).bind('cbox_closed', function () {
+        $('html').css({ overflow: 'auto' });
+    }); 
 
     /**
      * When scrolled all the way to the bottom, add more tiles.
@@ -63,10 +79,12 @@ $(document).ready(function () {
             $('a', handler).colorbox({
               rel: 'lightbox', 
                 photo: true,
-            opacity: 0,
-            title: function() {
-                return $(this).siblings('label').text();
-            }
+                opacity: 1,
+                height: $(window).height(), 
+                scalePhotos: false,
+                title: function() {
+                    return $(this).siblings('label').text();
+                }
             });
         });
         
