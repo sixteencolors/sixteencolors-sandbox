@@ -71,7 +71,8 @@ h1 {
     width: 352px;
 }
 
-label { 
+label {
+    overflow: hidden; 
     color: #000;
     position: relative; 
     left: 0px;

@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var pack = 'sense14j';
+    var pack = '27inch04';
     var handler = null,
         page = 1,
         isLoading = false,
@@ -79,7 +79,7 @@ $(document).ready(function () {
             $('a', handler).colorbox({
               rel: 'lightbox', 
                 photo: true,
-                opacity: 1,
+                opacity: 0.9,
                 height: $(window).height(), 
                 scalePhotos: false,
                 title: function() {
@@ -96,7 +96,7 @@ $(document).ready(function () {
         $('#loaderCircle').show();
 
         $.ajax({
-            url: apiURL + '/pack/' + pack,
+            url: apiURL + 'pack/' + pack,
             dataType: 'jsonp',
             // data: {page: page}, // Page parameter to make sure we load new data
             success: onLoadPack
