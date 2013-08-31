@@ -1,13 +1,15 @@
 $(document).ready(function () {
+    var pack = 'sense14j';
     var handler = null,
         page = 1,
         isLoading = false,
-        apiURL = 'http://api.sixteencolors.net/v0/pack/random';
+        apiURL = 'http://api.sixteencolors.net/v0/';
 
     // Prepare layout options.
     var options = {
         container: $("#pack_contents"),
         gutter: 16,
+        columnWidth: 176
     };
 
     $('a', handler).colorbox({
@@ -76,10 +78,10 @@ $(document).ready(function () {
         $('#loaderCircle').show();
 
         $.ajax({
-            url: apiURL,
+            url: apiURL + '/pack/' + pack,
             dataType: 'jsonp',
             // data: {page: page}, // Page parameter to make sure we load new data
-            success: onLoadPacks
+            success: onLoadPack
         });
     }
 
@@ -112,7 +114,11 @@ $(document).ready(function () {
             image;
         for (; i < length; i++) {
             image = data.files[i];
-            html += '<li><a href="http://sixteencolors.net' + image.fullsize + '" rel="lightbox">';
+            cssClass = "";
+            if (/\.bin/i.test(image.filename)) {
+                cssClass = 'bin';
+            }
+            html += '<li class="' + cssClass + '"><a href="http://sixteencolors.net' + image.fullsize + '" rel="lightbox">';
             html += '<img src="http://sixteencolors.net' + image.thumbnail + '" alt="' + image.filename + '" />';
             html += '<label>' + image.filename + '</label>';
             html += '</a></li>';
@@ -129,7 +135,7 @@ $(document).ready(function () {
     }
 
     // Capture scroll event.
-    $(document).bind('scroll', onScroll);
+    // $(document).bind('scroll', onScroll);
 
     // Load first data from the API.
     loadData();
