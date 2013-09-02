@@ -12,6 +12,12 @@ $(document).ready(function () {
         columnWidth: 176
     };
 
+    var hash = $(window.location).attr("hash").split('/');
+
+    if (hash.length > 1) {
+        pack = hash[1];
+    }
+
     $('a', handler).colorbox({
         rel: 'lightbox',
         photo: true,

@@ -22,7 +22,10 @@ header {
     display: block;
     text-align: left;
     background: #000;
+    /* background: #000000 url("http://www.idledreams.net/images/avatars/16c-splash.png") center right no-repeat; */
+    background-size: auto 32px;
     color: #fff;
+
 }
 
 h1 {
@@ -65,6 +68,7 @@ h1 {
 #pack_contents ul {
     position: absolute;
     clear: both;
+    margin-left: 16px;
 }
 
 #pack_contents li.bin img {
