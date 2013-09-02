@@ -24,7 +24,7 @@ $(document).ready(function () {
         opacity: 0,
         height: '100%',
         title: function () {
-            return $(this).siblings('label').text();
+            return $(this).siblings('label span').text();
         }
     });
 
@@ -89,7 +89,7 @@ $(document).ready(function () {
                 height: $(window).height(), 
                 scalePhotos: false,
                 title: function() {
-                    return $(this).siblings('label').text();
+                    return $(this).siblings('label span').text();
                 }
             });
         });
@@ -144,7 +144,7 @@ $(document).ready(function () {
             }
             html += '<li class="' + cssClass + '"><a href="http://sixteencolors.net' + image.fullsize + '" rel="lightbox">';
             html += '<img src="http://sixteencolors.net' + image.thumbnail + '" alt="' + image.filename + '" />';
-            html += '<label>' + image.filename + '</label>';
+            html += '<label><span>' + image.filename + '</span></label>';
             html += '</a></li>';
 
         }

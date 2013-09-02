@@ -72,7 +72,7 @@ h1 {
 }
 
 #pack_contents li.bin img {
-    width: 352px;
+    width: 370px;
 }
 
 label {
@@ -85,6 +85,12 @@ label {
     background: #fff;
     padding: 8px;
     margin-top: 4px;
+}
+
+label span {
+    width: 160px;
+    overflow: hidden;
+    display: block;
 }
 
 #pack_contents a {
