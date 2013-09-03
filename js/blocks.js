@@ -64,24 +64,37 @@ $(document).ready(function () {
      */
 
     function applyLayout() {
-        var container = $('#pack_contents');
+        /* var container = $('#pack_contents');
         container.imagesLoaded(function () {
             var msnry = container.masonry({
                 //options
-                itemSelector: 'li',
+                itemSelector: 'li:not(.stamp)',
                 gutter: 16
             });   
-        });
+        }); */
 
-        options.container.imagesLoaded(function () {
+        clearProgress();
+
+        options.container.imagesLoaded(function (instance) {
+            $('#progress').hide();
+            $('#pack_contents ul').css('left', 'auto');
+            options.container.masonry({
+                    //options
+                    itemSelector: 'li:not(.stamp)',
+                    stamp: '.stamp',
+                    gutter: 16
+                });  
+
+            var msnry = options.container.data('masonry');
+
+            $('#pack_contents ul').css("text-indent", "auto");
             // Create a new layout handler when images have loaded.
             handler = $('#pack_contents ul li');
-            var msnry = options.container.masonry({
-                //options
-                itemSelector: 'li',
-                gutter: 16
-            });   
             
+            for (var i = 0, len = instance.images.length; i < len; i++ ) {
+                var image = instance.images[i];
+            }
+
             $('a', handler).colorbox({
               rel: 'lightbox', 
                 photo: true,
@@ -92,9 +105,23 @@ $(document).ready(function () {
                     return $(this).siblings('label span').text();
                 }
             });
+
+            msnry.layout();
+        })
+        .progress(function(instance, image) {
+            if (image.isLoaded) {
+                $('<span>.</span>').appendTo('#progress')
+                
+
+
+            }
+            var result = image.isLoaded? 'loaded' : 'broken';
         });
         
-        
+    }
+
+    function clearProgress() {
+        $('#progress').text('Loading');
     }
 
     function loadData() {
@@ -118,21 +145,16 @@ $(document).ready(function () {
         });
     }
 
+    $.preload = function() {
+        this.each(function() {
+            $('<img/>'[0].src = this);
+        });
+    }
 
-
-    /**
-     * Receives data from the API, creates HTML for images and updates the layout
-     */
-
-    function onLoadPack(data) {
-        isLoading = false;
-        $('#loaderCircle').hide();
-
-        // Increment page index for future calls.
-        page++;
-
-        // Create HTML for the images.
-        var html = '<h1>' + data.name + ', ' + data.year + '</h1><ul class="pack">';
+    function generatePackHtml(data) {
+        var html = '<h1>' + data.name + ', ' + data.year + '</h1>';
+        html += '<div id="progress">Loading</div><ul class="pack">';
+        html += '<img src="http://sixteencolors.net/pack/' + data.name + '/preview" class="stamp" />';
         var i = 0,
             length = data.files.length,
             image;
@@ -141,7 +163,7 @@ $(document).ready(function () {
             cssClass = "";
             if (/\.bin/i.test(image.filename)) {
                 cssClass = 'bin';
-            }
+            } 
             html += '<li class="' + cssClass + '"><a href="http://sixteencolors.net' + image.fullsize + '" rel="lightbox">';
             html += '<img src="http://sixteencolors.net' + image.thumbnail + '" alt="' + image.filename + '" />';
             html += '<label><span>' + image.filename + '</span></label>';
@@ -156,6 +178,22 @@ $(document).ready(function () {
 
         // Apply layout.
         applyLayout();
+    }
+
+    /**
+     * Receives data from the API, creates HTML for images and updates the layout
+     */
+
+    function onLoadPack(data) {
+        isLoading = false;
+        $('#loaderCircle').hide();
+
+        generatePackHtml(data);
+
+        /* for (; i < length; i++) {
+            $.preload({ 'http://sixteencolors.net' + data.files[i].image.thumbnail });
+        } */
+        
     }
 
     // Capture scroll event.

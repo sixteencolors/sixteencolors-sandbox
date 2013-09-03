@@ -38,7 +38,7 @@ h1 {
     font-size: 1em;
 }
 
-#pack_contents li {
+#pack_contents li, #pack_contents > img.stamp {
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     -ms-border-radius: 3px;
@@ -55,8 +55,21 @@ h1 {
     -moz-transition: all 0.2s ease-in-out;
     -o-transition: all 0.2s ease-in-out;
     -ms-transition: all 0.2s ease-in-out;
+
 }
 
+#pack_contents li.loading {
+    width: 176px;
+    height: 200px;
+}
+
+#pack_contents li.loading img {
+    height: 176px;
+}
+
+#pack_contents li.loading.bin {
+    width: 176px;
+}
 
 #pack_contents li:hover {
     /* -webkit-transform: scale(1.2);
@@ -69,6 +82,11 @@ h1 {
     position: absolute;
     clear: both;
     margin-left: 16px;
+    left: -99999em;
+}
+
+#progress {
+    margin-left: 32px;
 }
 
 #pack_contents li.bin img {
@@ -100,4 +118,11 @@ label span {
 
 #pack_contents a:hover {
     color: #fff;
+}
+
+#pack_contents img.stamp {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 370px;
 }
