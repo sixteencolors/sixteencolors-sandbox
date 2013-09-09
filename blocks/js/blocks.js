@@ -104,7 +104,8 @@ $(document).ready(function () {
 			});
 
 			msnry.layout();
-			$('html').css({ cursor: 'default' });
+			// restore cursor and overflow now that we're loaded
+			$('html').css({ cursor: 'default', overflow: 'auto' });
 		})
 		.progress(function(instance, image) {
 			// block-shaded progress bar
@@ -131,7 +132,7 @@ $(document).ready(function () {
 
 		for (var a = 0; a < 50; a++) bar += '<span data-loaded="0">\xb0</span>';
 		$('#progress').html(bar + '<br />Loading...');
-		$('html').css({ cursor: 'progress' });
+		$('html').css({ cursor: 'progress', overflow: 'hidden' });
 	}
 
 	function loadData() {
@@ -173,8 +174,6 @@ $(document).ready(function () {
 
 		html += '</ul>';
 
-		// prevent overflow until layout is applied
-		$('html').css({ overflow: 'hidden' });
 		// Add image HTML to the page.
 		$('#pack_contents').append(html);
 
