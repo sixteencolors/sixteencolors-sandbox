@@ -136,7 +136,7 @@ label span {
 	height: 120px;
 	width: 120px;
 	overflow: hidden;
-	position: absolute;
+	position: fixed;
 	z-index: 999999;
 	display: none;
 	cursor: pointer;
