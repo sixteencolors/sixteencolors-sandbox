@@ -86,6 +86,21 @@ $(document).ready(function () {
 					$('#cbox_prev, #cbox_next').hide();
 				}
 				, onComplete: function () {
+					// resize window for scrollers
+					var adjustment = 0;
+
+					if ($('#cboxLoadedContent').height() < $('#cboxLoadedContent img').height()) {
+						var boxheight = $('#cboxLoadedContent').height();
+
+						if ($('#colorbox').width() + 20 > $(window).width()) {
+							$.colorbox.resize({ width: $(window).width(), height: '100%' });
+						} else {
+							$.colorbox.resize({ innerWidth: $('#cboxLoadedContent img').width() + 20, height: '100%' });
+						}
+
+						adjustment = 10;
+					}
+
 					// block-shaded representation of image's position in pack
 					var
 						$cur = $('#cboxCurrent')
@@ -123,7 +138,7 @@ $(document).ready(function () {
 					$('#cbox_next').css({ background: 'url(' + next.attr('src') + ')' });
 					$('#cbox_prev, #cbox_next').show();
 					// recalculate prev/next alignment in case new image size is different than last
-					alignControls();
+					alignControls(adjustment);
 				}
 			});
 
@@ -205,7 +220,7 @@ $(document).ready(function () {
 		applyLayout();
 	}
 
-	function alignControls() {
+	function alignControls(adjustment) {
 		// vertically center the next/prev elements
 		$('#cbox_prev, #cbox_next').css({
 			top: Math.round($(window).height() / 2) - Math.round($('#cbox_prev').height() / 2) + 'px'
@@ -213,7 +228,7 @@ $(document).ready(function () {
 
 		// horizontally
 		$('#cbox_prev').css({
-			left: Math.round($(window).width() / 2 - $('#colorbox').width() / 2 - $('#cbox_prev').width()) + 'px'
+			left: Math.round($(window).width() / 2 - $('#colorbox').width() / 2 - $('#cbox_prev').width() - (typeof adjustment == 'undefined' ? 0 : adjustment)) + 'px'
 		});
 		$('#cbox_next').css({ right: $('#cbox_prev').position().left + 'px' });
 	}
