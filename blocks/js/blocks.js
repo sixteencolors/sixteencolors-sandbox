@@ -82,17 +82,20 @@ $(document).ready(function () {
 					var
 						$cur = $('#cboxCurrent')
 						, bar = ''
+						, barWidth = 10
+						, count = 0
 						, prog = /(\d+)\D+(\d+)/i.exec($cur.html())
-						, pct = Math.round(prog[1] / prog[2] * 10)
+						, pct = Math.round(prog[1] / prog[2] * barWidth)
 					;
 
-					for (var a = 0; a < pct - 1; a++) {
+					for (; count < pct - 1; count++) {
 						bar += '\xb2';
 					}
 
 					bar += '\xb1';
+					count++;
 
-					for (var a = 0; a < 10 - pct; a++) {
+					for (; count < barWidth; count++) {
 						bar += '\xb0';
 					}
 
