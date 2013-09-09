@@ -57,6 +57,7 @@ $(document).ready(function () {
 	 */
 
 	function applyLayout() {
+		var howmany = 0;
 		clearProgress();
 
 		options.container.imagesLoaded(function (instance) {
@@ -93,8 +94,15 @@ $(document).ready(function () {
 			msnry.layout();
 		})
 		.progress(function(instance, image) {
+			var pct = Math.round(++howmany / instance.images.length * 50);
+
 			if (image.isLoaded) {
-				$('<span>.</span>').appendTo('#progress')
+				var $which = $('#progress span:first');
+
+				for (var a = 0; a < pct; a++) {
+					$which.html('\xb2');
+					$which = $which.next('span');
+				}
 			}
 
 			var result = image.isLoaded? 'loaded' : 'broken';
@@ -103,7 +111,10 @@ $(document).ready(function () {
 	}
 
 	function clearProgress() {
-		$('#progress').text('Loading');
+		var bar = '';
+
+		for (var a = 0; a < 50; a++) bar += '<span data-loaded="0">\xb0</span>';
+		$('#progress').html(bar);
 	}
 
 	function loadData() {

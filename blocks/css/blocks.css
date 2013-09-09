@@ -86,7 +86,7 @@ h1 {
 }
 
 #progress {
-    margin-left: 32px;
+	text-align: center;
 }
 
 #pack_contents li.bin img {
