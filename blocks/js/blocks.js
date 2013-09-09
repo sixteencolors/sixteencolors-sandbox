@@ -73,8 +73,8 @@ $(document).ready(function () {
 				rel: 'lightbox'
 				, photo: true
 				, opacity: 0.9
-				, height: $(window).height()
-				, maxWidth: $(window).width()
+				, height: '100%'
+				, maxWidth: '100%'
 				, scalePhotos: false
 				, title: function () {
 					return $(this).find('label span').html();
@@ -112,13 +112,17 @@ $(document).ready(function () {
 					// prev/next images
 					var prev, next;
 
+					// prev: either prev or last in set
 					prev = $.colorbox.element().parent().prev('li').find('img');
 					if (prev.length == 0) prev = $('ul.pack li:last img');
+					// next: either next or first in set
 					next = $.colorbox.element().parent().next('li').find('img');
 					if (next.length == 0) next = $('ul.pack li:first img')
+					// set their background images and show 'em
 					$('#cbox_prev').css({ background: 'url(' + prev.attr('src') + ')' });
 					$('#cbox_next').css({ background: 'url(' + next.attr('src') + ')' });
 					$('#cbox_prev, #cbox_next').show();
+					// recalculate prev/next alignment in case new image size is different than last
 					alignControls();
 				}
 			});
@@ -252,14 +256,15 @@ $(document).ready(function () {
 	 */
 
 	function onResize() {
-		//check if colorbox is open. This 'if' is from stackoverflow, I haven't tested
 		if($('#colorbox').length && $('#colorbox').css('display') != 'none') {
-			//replace colorboxID with the correct ID colorbox uses
-			document.getElementById('cboxContent').style.height=$(window).height();
+			if ($('#colorbox').height() != $('#cboxOverlay').height()) {
+				$.colorbox.resize({ height: $('#cboxOverlay').height() });
+			}
+
 			alignControls();
 		}
 	}
-	
+
 	/**
 	 * When scrolled all the way to the bottom, add more tiles.
 	 */
