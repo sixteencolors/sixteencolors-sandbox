@@ -184,7 +184,7 @@ $(document).ready(function () {
 
 		if (hash.length > 1) {
 			pack = hash[1];
-			options.container.masonry('destroy');
+			try { options.container.masonry('destroy'); } catch (ex) {}
 			$('#pack_contents').html('');
 			loadData();
 			return true;
