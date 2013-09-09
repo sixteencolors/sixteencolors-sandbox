@@ -10,7 +10,7 @@ A pinterest-inspired layout to see the full thumbnail of every element in a pack
 - [x] Display in pinterest-like layout
 - [x] Show lightbox on click
 - [x] Show loading message while images load
-- [ ] Make lightbox show previous and next image as thumbnail to navigate
+- [x] Make lightbox show previous and next image as thumbnail to navigate
 - [x] Show "progress" in lightbox (image in pack, rather than numbered, as f2/f4 blocks or similar)
 - [x] Make "Loading" message ANSI blocks (or something) and centered
 - [ ] Show artwork details in lightbox
