@@ -1,224 +1,232 @@
 $(document).ready(function () {
-    var pack = '27inch04';
-    var handler = null,
-        page = 1,
-        isLoading = false,
-        apiURL = 'http://api.sixteencolors.net/v0/';
+	var
+		pack = '27inch04'
+		, handler = null
+		, page = 1
+		, isLoading = false
+		, apiURL = 'http://api.sixteencolors.net/v0/'
+		// layout options
+		, options = {
+			container: $("#pack_contents")
+			, gutter: 16
+			, columnWidth: 176
+		}
+	;
 
-    // Prepare layout options.
-    var options = {
-        container: $("#pack_contents"),
-        gutter: 16,
-        columnWidth: 176
-    };
+	$(window).on("resize", function(){
+		//check if colorbox is open. This 'if' is from stackoverflow, I haven't tested
+		if($('#colorbox').length && $('#colorbox').css('display') != 'none') {
+			//replace colorboxID with the correct ID colorbox uses
+			document.getElementById('cboxContent').style.height=$(window).height();
+		}
+	});
 
-    var hash = $(window.location).attr("hash").split('/');
+	// Lock body of page to not scroll
 
-    if (hash.length > 1) {
-        pack = hash[1];
-    }
+	$(document).bind('cbox_open', function () {
+		$('html').css({ overflow: 'hidden' });
+	}).bind('cbox_closed', function () {
+		$('html').css({ overflow: 'auto' });
+	});
 
-    $('a', handler).colorbox({
-        rel: 'lightbox',
-        photo: true,
-        opacity: 0,
-        height: '100%',
-        title: function () {
-            return $(this).siblings('label span').text();
-        }
-    });
+	// capture hash change
+	$(window).bind('hashchange', onHashChange);
 
-    $(window).on("resize", function(){
-    //check if colorbox is open. This 'if' is from stackoverflow, I haven't tested
-    if($('#colorbox').length && $('#colorbox').css('display') != 'none') {
-        //replace colorboxID with the correct ID colorbox uses
-        document.getElementById('cboxContent').style.height=$(window).height();
-    }
-});
+	// Capture scroll event.
+	// $(document).bind('scroll', onScroll);
 
-    // Lock body of page to not scroll
-    
-    $(document).bind('cbox_open', function () {
-        $('html').css({ overflow: 'hidden' });
-    }).bind('cbox_closed', function () {
-        $('html').css({ overflow: 'auto' });
-    }); 
+	// Load first data from the API.
+	if (! onHashChange()) {
+		loadData();
+	}
 
-    /**
-     * When scrolled all the way to the bottom, add more tiles.
-     */
+	/**
+	 * Refreshes the layout.
+	 */
 
-    function onScroll(event) {
-        // Only check when we're not still waiting for data.
-        if (!isLoading) {
-            // Check if we're within 100 pixels of the bottom edge of the broser window.
-            var closeToBottom = ($(window).scrollTop() + $(window).height() > $(document).height() - 100);
-            if (closeToBottom) {
-                loadData();
-            }
-        }
-    }
+	function applyLayout() {
+		var howmany = 0;
+		clearProgress();
 
-    /**
-     * Refreshes the layout.
-     */
+		options.container.imagesLoaded(function (instance) {
+			$('#progress').hide();
+			$('#pack_contents ul').css('left', 'auto');
 
-    function applyLayout() {
-        /* var container = $('#pack_contents');
-        container.imagesLoaded(function () {
-            var msnry = container.masonry({
-                //options
-                itemSelector: 'li:not(.stamp)',
-                gutter: 16
-            });   
-        }); */
+			options.container.masonry({
+				itemSelector: 'li:not(.stamp)'
+				, stamp: '.stamp'
+				, gutter: 16
+			});
 
-        clearProgress();
+			var msnry = options.container.data('masonry');
 
-        options.container.imagesLoaded(function (instance) {
-            $('#progress').hide();
-            $('#pack_contents ul').css('left', 'auto');
-            options.container.masonry({
-                    //options
-                    itemSelector: 'li:not(.stamp)',
-                    stamp: '.stamp',
-                    gutter: 16
-                });  
+			$('#pack_contents ul').css("text-indent", "auto");
+			// Create a new layout handler when images have loaded.
+			handler = $('#pack_contents ul li');
 
-            var msnry = options.container.data('masonry');
+			for (var i = 0, len = instance.images.length; i < len; i++ ) {
+				var image = instance.images[i];
+			}
 
-            $('#pack_contents ul').css("text-indent", "auto");
-            // Create a new layout handler when images have loaded.
-            handler = $('#pack_contents ul li');
-            
-            for (var i = 0, len = instance.images.length; i < len; i++ ) {
-                var image = instance.images[i];
-            }
+			$('a', handler).colorbox({
+				rel: 'lightbox'
+				, photo: true
+				, opacity: 0.9
+				, height: $(window).height()
+				, scalePhotos: false
+				, title: function () {
+					return $(this).find('label span').html();
+				}
+				, onComplete: function () {
+					// block-shaded representation of image's position in pack
+					var
+						$cur = $('#cboxCurrent')
+						, bar = ''
+						, barWidth = 10
+						, count = 0
+						, prog = /(\d+)\D+(\d+)/i.exec($cur.html())
+						, pct = Math.round(prog[1] / prog[2] * barWidth)
+					;
 
-            $('a', handler).colorbox({
-              rel: 'lightbox', 
-                photo: true,
-                opacity: 0.9,
-                height: $(window).height(), 
-                scalePhotos: false,
-                title: function() {
-                    return $(this).siblings('label span').text();
-                }
-            });
+					for (; count < pct - 1; count++) {
+						bar += '\xb2';
+					}
 
-            msnry.layout();
-        })
-        .progress(function(instance, image) {
-            if (image.isLoaded) {
-                $('<span>.</span>').appendTo('#progress')
-                
+					bar += '\xb1';
+					count++;
 
+					for (; count < barWidth; count++) {
+						bar += '\xb0';
+					}
 
-            }
-            var result = image.isLoaded? 'loaded' : 'broken';
-        });
-        
-    }
+					$cur.html(bar + ' ' + prog[1] + '/' + prog[2]);
+				}
+			});
 
-    function clearProgress() {
-        $('#progress').text('Loading');
-    }
+			msnry.layout();
+			// restore cursor and overflow now that we're loaded
+			$('html').css({ cursor: 'default', overflow: 'auto' });
+		})
+		.progress(function(instance, image) {
+			// block-shaded progress bar
+			var pct = Math.round(++howmany / instance.images.length * 50);
 
-    function loadData() {
-        isLoading = true;
-        $('#loaderCircle').show();
+			if (image.isLoaded) {
+				var $which = $('#progress span:first');
 
-        $.ajax({
-            url: apiURL + 'pack/' + pack,
-            dataType: 'jsonp',
-            // data: {page: page}, // Page parameter to make sure we load new data
-            success: onLoadPack
-        });
-    }
+				for (var a = 0; a < pct - 1; a++) {
+					$which.html('\xb2');
+					$which = $which.next('span');
+				}
 
-    function onLoadPacks(data) {
-        var i = 0;     
-        $.ajax({
-            url: 'http://api.sixteencolors.net/v0/pack/' + data[i].name + '?callback=?',
-            dataType: 'jsonp',
-            success: onLoadPack
-        });
-    }
+				$which.html('\xb1');
+			}
 
-    $.preload = function() {
-        this.each(function() {
-            $('<img/>'[0].src = this);
-        });
-    }
+			var result = image.isLoaded? 'loaded' : 'broken';
+		});
 
-    function generatePackHtml(data) {
-        var html = '<h1>' + data.name + ', ' + data.year + '</h1>';
-        html += '<div id="progress">Loading</div><ul class="pack">';
-        html += '<img src="http://sixteencolors.net/pack/' + data.name + '/preview" class="stamp" />';
-        var i = 0,
-            length = data.files.length,
-            image;
-        for (; i < length; i++) {
-            image = data.files[i];
-            cssClass = "";
-            if (/\.bin/i.test(image.filename)) {
-                cssClass = 'bin';
-            } 
-            html += '<li class="' + cssClass + '"><a href="http://sixteencolors.net' + image.fullsize + '" rel="lightbox">';
-            html += '<img src="http://sixteencolors.net' + image.thumbnail + '" alt="' + image.filename + '" />';
-            html += '<label><span>' + image.filename + '</span></label>';
-            html += '</a></li>';
+	}
 
-        }
+	function clearProgress() {
+		var bar = '';
 
-        html += '</ul>';
+		for (var a = 0; a < 50; a++) bar += '<span data-loaded="0">\xb0</span>';
+		$('#progress').html(bar + '<br />Loading...');
+		$('html').css({ cursor: 'progress', overflow: 'hidden' });
+	}
 
-        // Add image HTML to the page.
-        $('#pack_contents').append(html);
+	function loadData() {
+		isLoading = true;
+		$('#loaderCircle').show();
 
-        // Apply layout.
-        applyLayout();
-    }
+		$.ajax({
+			url: apiURL + 'pack/' + pack,
+			dataType: 'jsonp',
+			// data: {page: page}, // Page parameter to make sure we load new data
+			success: onLoadPack
+		});
+	}
 
-    /**
-     * Receives data from the API, creates HTML for images and updates the layout
-     */
+	function generatePackHtml(data) {
+		var html = '<h1>' + data.name + ', ' + data.year + '</h1>';
+		html += '<div id="progress">Loading</div><ul class="pack">';
+		html += '<img src="http://sixteencolors.net/pack/' + data.name + '/preview" class="stamp" />';
 
-    function onLoadPack(data) {
-        isLoading = false;
-        $('#loaderCircle').hide();
+		var
+			i = 0
+			, length = data.files.length
+			, image
+		;
 
-        generatePackHtml(data);
+		for (; i < length; i++) {
+			image = data.files[i];
+			cssClass = "";
 
-        /* for (; i < length; i++) {
-            $.preload({ 'http://sixteencolors.net' + data.files[i].image.thumbnail });
-        } */
-        
-    }
+			if (/\.bin/i.test(image.filename)) {
+				cssClass = 'bin';
+			}
 
-    // Capture scroll event.
-    // $(document).bind('scroll', onScroll);
+			html += '<li class="' + cssClass + '"><a href="http://sixteencolors.net' + image.fullsize + '" rel="lightbox">';
+			html += '<img src="http://sixteencolors.net' + image.thumbnail + '" alt="' + image.filename + '" />';
+			html += '<label><span>' + image.filename + '</span></label>';
+			html += '</a></li>';
+		}
 
-    // Load first data from the API.
-    loadData();
+		html += '</ul>';
 
-    /* $('#pack_contents').imagesLoaded(function() {
-        handler = $('#pack_contents ul li');
-        handler.wookmark({
-            container: $("#pack_contents"), 
-            offset: 16, 
-            itemWidth: 176,
-            // flexibleWidth: 352, 
-            autoresize: true, 
-            outerOffset: 24,
-            container: $("#pack_contents")});
-        $('a', handler).colorbox({
-              rel: 'lightbox', 
-                photo: true,
-            opacity: 0,
-            title: function() {
-                return $(this).siblings('label').text();
-            }
-            });
-    });*/
+		// Add image HTML to the page.
+		$('#pack_contents').append(html);
+
+		// Apply layout.
+		applyLayout();
+	}
+
+	/**
+	 * When has changes, load a new pack
+	 */
+
+	function onHashChange (event) {
+		var hash = $(window.location).attr("hash").split('/');
+
+		if (hash.length > 1) {
+			pack = hash[1];
+
+			// if there's masonry, tear it down first
+			if ($('#pack_contents h1').length > 0) {
+				options.container.masonry('destroy');
+				$('#pack_contents').html('');
+			}
+
+			loadData();
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Receives data from the API, creates HTML for images and updates the layout
+	 */
+
+	function onLoadPack(data) {
+		isLoading = false;
+		$('#loaderCircle').hide();
+		generatePackHtml(data);
+	}
+
+	/**
+	 * When scrolled all the way to the bottom, add more tiles.
+	 */
+
+	function onScroll(event) {
+		// Only check when we're not still waiting for data.
+		if (!isLoading) {
+			// Check if we're within 100 pixels of the bottom edge of the broser window.
+			var closeToBottom = ($(window).scrollTop() + $(window).height() > $(document).height() - 100);
+
+			if (closeToBottom) {
+				loadData();
+			}
+		}
+	}
 });
