@@ -13,16 +13,17 @@ $(document).ready(function () {
 		}
 	;
 
-	$(window).on("resize", function(){
-		//check if colorbox is open. This 'if' is from stackoverflow, I haven't tested
-		if($('#colorbox').length && $('#colorbox').css('display') != 'none') {
-			//replace colorboxID with the correct ID colorbox uses
-			document.getElementById('cboxContent').style.height=$(window).height();
-		}
-	});
+	// prev/next bindings
+	$('#cbox_prev').bind('click', $.colorbox.prev);
+	$('#cbox_next').bind('click', $.colorbox.next);
+
+	// handle window resizing
+	$(window).on("resize", onResize);
+
+	// force resize event once
+	onResize();
 
 	// Lock body of page to not scroll
-
 	$(document).bind('cbox_open', function () {
 		$('html').css({ overflow: 'hidden' });
 	}).bind('cbox_closed', function () {
@@ -73,9 +74,16 @@ $(document).ready(function () {
 				, photo: true
 				, opacity: 0.9
 				, height: $(window).height()
+				, maxWidth: $(window).width()
 				, scalePhotos: false
 				, title: function () {
 					return $(this).find('label span').html();
+				}
+				, onLoad: function () {
+					$('#cbox_prev, #cbox_next').hide();
+				}
+				, onCleanup: function() {
+					$('#cbox_prev, #cbox_next').hide();
 				}
 				, onComplete: function () {
 					// block-shaded representation of image's position in pack
@@ -100,6 +108,18 @@ $(document).ready(function () {
 					}
 
 					$cur.html(bar + ' ' + prog[1] + '/' + prog[2]);
+
+					// prev/next images
+					var prev, next;
+
+					prev = $.colorbox.element().parent().prev('li').find('img');
+					if (prev.length == 0) prev = $('ul.pack li:last img');
+					next = $.colorbox.element().parent().next('li').find('img');
+					if (next.length == 0) next = $('ul.pack li:first img')
+					$('#cbox_prev').css({ background: 'url(' + prev.attr('src') + ')' });
+					$('#cbox_next').css({ background: 'url(' + next.attr('src') + ')' });
+					$('#cbox_prev, #cbox_next').show();
+					alignControls();
 				}
 			});
 
@@ -181,6 +201,19 @@ $(document).ready(function () {
 		applyLayout();
 	}
 
+	function alignControls() {
+		// vertically center the next/prev elements
+		$('#cbox_prev, #cbox_next').css({
+			top: Math.round($(window).height() / 2) - Math.round($('#cbox_prev').height() - 2) + 'px'
+		});
+
+		// horizontally
+		$('#cbox_prev').css({
+			left: Math.round($(window).width() / 2 - $('#colorbox').width() / 2 - $('#cbox_prev').width()) + 'px'
+		});
+		$('#cbox_next').css({ right: $('#cbox_prev').position().left + 'px' });
+	}
+
 	/**
 	 * When has changes, load a new pack
 	 */
@@ -214,6 +247,19 @@ $(document).ready(function () {
 		generatePackHtml(data);
 	}
 
+	/**
+	 * Handle window resizing
+	 */
+
+	function onResize() {
+		//check if colorbox is open. This 'if' is from stackoverflow, I haven't tested
+		if($('#colorbox').length && $('#colorbox').css('display') != 'none') {
+			//replace colorboxID with the correct ID colorbox uses
+			document.getElementById('cboxContent').style.height=$(window).height();
+			alignControls();
+		}
+	}
+	
 	/**
 	 * When scrolled all the way to the bottom, add more tiles.
 	 */

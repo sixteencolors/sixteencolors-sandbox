@@ -131,3 +131,14 @@ label span {
 	top: 0;
 	width: 370px;
 }
+
+#cbox_prev, #cbox_next {
+	height: 120px;
+	width: 120px;
+	overflow: hidden;
+	position: absolute;
+	z-index: 999999;
+	display: none;
+	cursor: pointer;
+	background-size: 120px auto !important;
+}
