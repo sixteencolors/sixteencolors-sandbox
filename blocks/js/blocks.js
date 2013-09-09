@@ -133,9 +133,15 @@ $(document).ready(function () {
 					// next: either next or first in set
 					next = $.colorbox.element().parent().next('li').find('img');
 					if (next.length == 0) next = $('ul.pack li:first img')
-					// set their background images and show 'em
-					$('#cbox_prev').css({ background: 'url(' + prev.attr('src') + ')' });
-					$('#cbox_next').css({ background: 'url(' + next.attr('src') + ')' });
+					// set their background images/titles and show 'em
+					$('#cbox_prev')
+						.css({ background: 'url(' + prev.attr('src') + ')' })
+						.attr('title', 'Previous: ' + prev.siblings('label').find('span').html())
+					;
+					$('#cbox_next')
+						.css({ background: 'url(' + next.attr('src') + ')' })
+						.attr('title', 'Next: ' + next.siblings('label').find('span').html())
+					;
 					$('#cbox_prev, #cbox_next').show();
 					// recalculate prev/next alignment in case new image size is different than last
 					alignControls(adjustment);
