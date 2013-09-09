@@ -184,8 +184,13 @@ $(document).ready(function () {
 
 		if (hash.length > 1) {
 			pack = hash[1];
-			options.container.masonry('destroy');
-			$('#pack_contents').html('');
+			
+			// if there's masonry, tear it down first
+			if ($('#pack_contents h1').length == 0) {
+				options.container.masonry('destroy');
+				$('#pack_contents').html('');
+			}
+
 			loadData();
 			return true;
 		}
