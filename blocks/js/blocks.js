@@ -204,7 +204,7 @@ $(document).ready(function () {
 	function alignControls() {
 		// vertically center the next/prev elements
 		$('#cbox_prev, #cbox_next').css({
-			top: Math.round($(window).height() / 2) - Math.round($('#cbox_prev').height() - 2) + 'px'
+			top: Math.round($(window).height() / 2) - Math.round($('#cbox_prev').height() / 2) + 'px'
 		});
 
 		// horizontally
