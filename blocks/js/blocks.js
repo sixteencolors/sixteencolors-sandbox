@@ -37,7 +37,7 @@ $(document).ready(function () {
 
 	// Load first data from the API.
 	if (! onHashChange()) {
-		loadData(); // load default pack if none specified in url
+		loadData();
 	}
 
 	/**
@@ -74,14 +74,36 @@ $(document).ready(function () {
 				, opacity: 0.9
 				, height: $(window).height()
 				, scalePhotos: false
+				, title: function () {
+					return $(this).find('label span').html();
+				}
 				, onComplete: function () {
-					$('#cboxTitle').html($(this).find('label span').html());
+					// block-shaded representation of image's position in pack
+					var
+						$cur = $('#cboxCurrent')
+						, bar = ''
+						, prog = /(\d+)\D+(\d+)/i.exec($cur.html())
+						, pct = Math.round(prog[1] / prog[2] * 10)
+					;
+
+					for (var a = 0; a < pct - 1; a++) {
+						bar += '\xb2';
+					}
+
+					bar += '\xb1';
+
+					for (var a = 0; a < 10 - pct; a++) {
+						bar += '\xb0';
+					}
+
+					$cur.html(bar + ' ' + prog[1] + '/' + prog[2]);
 				}
 			});
 
 			msnry.layout();
 		})
 		.progress(function(instance, image) {
+			// block-shaded progress bar
 			var pct = Math.round(++howmany / instance.images.length * 50);
 
 			if (image.isLoaded) {
