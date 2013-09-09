@@ -99,10 +99,12 @@ $(document).ready(function () {
 			if (image.isLoaded) {
 				var $which = $('#progress span:first');
 
-				for (var a = 0; a < pct; a++) {
+				for (var a = 0; a < pct - 1; a++) {
 					$which.html('\xb2');
 					$which = $which.next('span');
 				}
+
+				$which.html('\xb1');
 			}
 
 			var result = image.isLoaded? 'loaded' : 'broken';
