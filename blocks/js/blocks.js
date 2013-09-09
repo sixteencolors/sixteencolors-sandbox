@@ -5,20 +5,13 @@ $(document).ready(function () {
 		, page = 1
 		, isLoading = false
 		, apiURL = 'http://api.sixteencolors.net/v0/'
+		// layout options
+		, options = {
+			container: $("#pack_contents")
+			, gutter: 16
+			, columnWidth: 176
+		}
 	;
-
-	// Prepare layout options.
-	var options = {
-		container: $("#pack_contents")
-		, gutter: 16
-		, columnWidth: 176
-	};
-
-	var hash = $(window.location).attr("hash").split('/');
-
-	if (hash.length > 1) {
-		pack = hash[1];
-	}
 
 	$(window).on("resize", function(){
 		//check if colorbox is open. This 'if' is from stackoverflow, I haven't tested
@@ -36,20 +29,15 @@ $(document).ready(function () {
 		$('html').css({ overflow: 'auto' });
 	});
 
-	/**
-	 * When scrolled all the way to the bottom, add more tiles.
-	 */
+	// capture hash change
+	$(window).bind('hashchange', onHashChange);
 
-	function onScroll(event) {
-		// Only check when we're not still waiting for data.
-		if (!isLoading) {
-			// Check if we're within 100 pixels of the bottom edge of the broser window.
-			var closeToBottom = ($(window).scrollTop() + $(window).height() > $(document).height() - 100);
+	// Capture scroll event.
+	// $(document).bind('scroll', onScroll);
 
-			if (closeToBottom) {
-				loadData();
-			}
-		}
+	// Load first data from the API.
+	if (! onHashChange()) {
+		loadData(); // load default pack if none specified in url
 	}
 
 	/**
@@ -166,6 +154,24 @@ $(document).ready(function () {
 	}
 
 	/**
+	 * When has changes, load a new pack
+	 */
+
+	function onHashChange (event) {
+		var hash = $(window.location).attr("hash").split('/');
+
+		if (hash.length > 1) {
+			pack = hash[1];
+			options.container.masonry('destroy');
+			$('#pack_contents').html('');
+			loadData();
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Receives data from the API, creates HTML for images and updates the layout
 	 */
 
@@ -175,9 +181,19 @@ $(document).ready(function () {
 		generatePackHtml(data);
 	}
 
-	// Capture scroll event.
-	// $(document).bind('scroll', onScroll);
+	/**
+	 * When scrolled all the way to the bottom, add more tiles.
+	 */
 
-	// Load first data from the API.
-	loadData();
+	function onScroll(event) {
+		// Only check when we're not still waiting for data.
+		if (!isLoading) {
+			// Check if we're within 100 pixels of the bottom edge of the broser window.
+			var closeToBottom = ($(window).scrollTop() + $(window).height() > $(document).height() - 100);
+
+			if (closeToBottom) {
+				loadData();
+			}
+		}
+	}
 });
