@@ -100,6 +100,7 @@ $(document).ready(function () {
 								.each(function() { $(this).width($(this).width() + 20); })
 								.css({ 'margin-left': '-11px' })
 							;
+							$('#cboxLoadedContent').height($('#cboxContent').height());
 						}
 
 						adjustment = 10;
