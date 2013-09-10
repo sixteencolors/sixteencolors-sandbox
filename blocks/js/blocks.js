@@ -18,7 +18,7 @@ $(document).ready(function () {
 	$('#cbox_next').bind('click', $.colorbox.next);
 
 	// handle window resizing
-	$(window).on("resize", onResize);
+	$(window).bind("resize", onResize);
 
 	// force resize event once
 	onResize();
