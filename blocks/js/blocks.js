@@ -95,7 +95,11 @@ $(document).ready(function () {
 						if ($('#colorbox').width() + 20 > $(window).width()) {
 							$.colorbox.resize({ width: $(window).width(), height: '100%' });
 						} else {
-							$.colorbox.resize({ innerWidth: $('#cboxLoadedContent img').width() + 20, height: '100%' });
+							//$.colorbox.resize({ innerWidth: $('#cboxLoadedContent img').width() + 20, height: '100%' });
+							$('#cboxLoadedContent')
+								.each(function() { $(this).width($(this).width() + 20); })
+								.css({ 'margin-left': '-11px' })
+							;
 						}
 
 						adjustment = 10;
