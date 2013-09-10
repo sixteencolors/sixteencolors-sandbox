@@ -76,14 +76,15 @@ $(document).ready(function () {
 				, height: '100%'
 				, maxWidth: '100%'
 				, scalePhotos: false
+				, transition: 'fade'
 				, title: function () {
 					return $(this).find('label span').html();
 				}
 				, onLoad: function () {
-					$('#cbox_prev, #cbox_next').hide();
+					$('#cbox_prev, #cbox_next').fadeOut(200);
 				}
 				, onCleanup: function() {
-					$('#cbox_prev, #cbox_next').hide();
+					$('#cbox_prev, #cbox_next').fadeOut(200);
 				}
 				, onComplete: function () {
 					// resize window for scrollers
@@ -146,7 +147,7 @@ $(document).ready(function () {
 						.css({ background: 'url(' + next.attr('src') + ')' })
 						.attr('title', 'Next: ' + next.siblings('label').find('span').html())
 					;
-					$('#cbox_prev, #cbox_next').show();
+					$('#cbox_prev, #cbox_next').fadeIn(200);
 					// recalculate prev/next alignment in case new image size is different than last
 					alignControls(adjustment);
 				}
