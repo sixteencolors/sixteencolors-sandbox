@@ -7,7 +7,7 @@ $(document).ready(function () {
 		, apiURL = 'http://api.sixteencolors.net/v0/'
 		// layout options
 		, options = {
-			container: $("#pack_contents")
+			container: $('#pack_contents')
 			, gutter: 16
 			, columnWidth: 176
 		}
@@ -18,7 +18,7 @@ $(document).ready(function () {
 	$('#cbox_next').bind('click', $.colorbox.next);
 
 	// handle window resizing
-	$(window).bind("resize", onResize);
+	$(window).bind('resize', onResize);
 
 	// force resize event once
 	onResize();
@@ -61,7 +61,7 @@ $(document).ready(function () {
 
 			var msnry = options.container.data('masonry');
 
-			$('#pack_contents ul').css("text-indent", "auto");
+			$('#pack_contents ul').css('text-indent', 'auto');
 			// Create a new layout handler when images have loaded.
 			handler = $('#pack_contents ul li');
 
@@ -210,7 +210,7 @@ $(document).ready(function () {
 
 		for (; i < length; i++) {
 			image = data.files[i];
-			cssClass = "";
+			cssClass = '';
 
 			if (/\.bin/i.test(image.filename)) {
 				cssClass = 'bin';
@@ -249,7 +249,7 @@ $(document).ready(function () {
 	 */
 
 	function onHashChange (event) {
-		var hash = $(window.location).attr("hash").split('/');
+		var hash = $(window.location).attr('hash').split('/');
 
 		if (hash.length > 1) {
 			pack = hash[1];
