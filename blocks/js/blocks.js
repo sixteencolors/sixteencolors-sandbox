@@ -282,12 +282,10 @@ $(document).ready(function () {
 	 */
 
 	function onResize() {
+		// reload colorbox if currently shown
 		if($('#colorbox').length && $('#colorbox').css('display') != 'none') {
-			if ($('#colorbox').height() != $('#cboxOverlay').height()) {
-				$.colorbox.resize({ height: $('#cboxOverlay').height() });
-			}
-
-			alignControls();
+			var el = $.colorbox.element();
+			$(el).click();
 		}
 	}
 
