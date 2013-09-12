@@ -38,6 +38,7 @@ $(document).ready(function () {
 
 	// Load first data from the API.
 	if (! onHashChange()) {
+		// no hash passed; load default pack
 		loadData();
 	}
 
@@ -189,11 +190,14 @@ $(document).ready(function () {
 		isLoading = true;
 		$('#loaderCircle').show();
 
+		// stub data
+		/* @DEBUG */ onLoadPack({"pack_file_location":"/static/packs/2003/27inch01.zip","files":[{"fullsize":"/pack/27inch01/27INCH.ANS/fullscale","thumbnail":"/pack/27inch01/27INCH.ANS/preview","filename":"27INCH.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/27INCH.ANS/download","uri":"/pack/27inch01/27INCH.ANS"},{"fullsize":"/pack/27inch01/27INFO.ANS/fullscale","thumbnail":"/pack/27inch01/27INFO.ANS/preview","filename":"27INFO.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/27INFO.ANS/download","uri":"/pack/27inch01/27INFO.ANS"},{"fullsize":"/pack/27inch01/43E0-IS.ANS/fullscale","thumbnail":"/pack/27inch01/43E0-IS.ANS/preview","filename":"43E0-IS.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/43E0-IS.ANS/download","uri":"/pack/27inch01/43E0-IS.ANS"},{"fullsize":"/pack/27inch01/AVG-27.ANS/fullscale","thumbnail":"/pack/27inch01/AVG-27.ANS/preview","filename":"AVG-27.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/AVG-27.ANS/download","uri":"/pack/27inch01/AVG-27.ANS"},{"fullsize":"/pack/27inch01/E0-COL1.ANS/fullscale","thumbnail":"/pack/27inch01/E0-COL1.ANS/preview","filename":"E0-COL1.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/E0-COL1.ANS/download","uri":"/pack/27inch01/E0-COL1.ANS"},{"fullsize":"/pack/27inch01/E0-OUTZ.ANS/fullscale","thumbnail":"/pack/27inch01/E0-OUTZ.ANS/preview","filename":"E0-OUTZ.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/E0-OUTZ.ANS/download","uri":"/pack/27inch01/E0-OUTZ.ANS"},{"fullsize":"/pack/27inch01/FILE_ID.DIZ/fullscale","thumbnail":"/pack/27inch01/FILE_ID.DIZ/preview","filename":"FILE_ID.DIZ","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/FILE_ID.DIZ/download","uri":"/pack/27inch01/FILE_ID.DIZ"},{"fullsize":"/pack/27inch01/QZE0-TSG.ANS/fullscale","thumbnail":"/pack/27inch01/QZE0-TSG.ANS/preview","filename":"QZE0-TSG.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/QZE0-TSG.ANS/download","uri":"/pack/27inch01/QZE0-TSG.ANS"},{"fullsize":"/pack/27inch01/TCF-PLAG.ANS/fullscale","thumbnail":"/pack/27inch01/TCF-PLAG.ANS/preview","filename":"TCF-PLAG.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/TCF-PLAG.ANS/download","uri":"/pack/27inch01/TCF-PLAG.ANS"},{"fullsize":"/pack/27inch01/TCF-RHN.ANS/fullscale","thumbnail":"/pack/27inch01/TCF-RHN.ANS/preview","filename":"TCF-RHN.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/TCF-RHN.ANS/download","uri":"/pack/27inch01/TCF-RHN.ANS"},{"fullsize":"/pack/27inch01/US-27I.ANS/fullscale","thumbnail":"/pack/27inch01/US-27I.ANS/preview","filename":"US-27I.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-27I.ANS/download","uri":"/pack/27inch01/US-27I.ANS"},{"fullsize":"/pack/27inch01/US-EXILE.ANS/fullscale","thumbnail":"/pack/27inch01/US-EXILE.ANS/preview","filename":"US-EXILE.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-EXILE.ANS/download","uri":"/pack/27inch01/US-EXILE.ANS"},{"fullsize":"/pack/27inch01/US-FLASH.ANS/fullscale","thumbnail":"/pack/27inch01/US-FLASH.ANS/preview","filename":"US-FLASH.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-FLASH.ANS/download","uri":"/pack/27inch01/US-FLASH.ANS"},{"fullsize":"/pack/27inch01/US-ROHAN.ANS/fullscale","thumbnail":"/pack/27inch01/US-ROHAN.ANS/preview","filename":"US-ROHAN.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-ROHAN.ANS/download","uri":"/pack/27inch01/US-ROHAN.ANS"},{"fullsize":"/pack/27inch01/US-SENSE.ANS/fullscale","thumbnail":"/pack/27inch01/US-SENSE.ANS/preview","filename":"US-SENSE.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-SENSE.ANS/download","uri":"/pack/27inch01/US-SENSE.ANS"},{"fullsize":"/pack/27inch01/US-TMNS.ANS/fullscale","thumbnail":"/pack/27inch01/US-TMNS.ANS/preview","filename":"US-TMNS.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-TMNS.ANS/download","uri":"/pack/27inch01/US-TMNS.ANS"}],"month":null,"name":"27inch01","uri":"/pack/27inch01","filename":"27inch01.zip","groups":[],"year":2003}); return;
+		
 		$.ajax({
-			url: apiURL + 'pack/' + pack,
-			dataType: 'jsonp',
-			// data: {page: page}, // Page parameter to make sure we load new data
-			success: onLoadPack
+			url: apiURL + 'pack/' + pack
+			, dataType: 'jsonp'
+			// , data: {page: page} // Page parameter to make sure we load new data
+			, success: onLoadPack
 		});
 	}
 
@@ -250,6 +254,7 @@ $(document).ready(function () {
 
 	function onHashChange (event) {
 		var hash = $(window.location).attr('hash').split('/');
+		/* @DEBUG */ hash = 'pack/27inch01';
 
 		if (hash.length > 1) {
 			pack = hash[1];
