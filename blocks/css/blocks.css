@@ -142,3 +142,11 @@ label span {
 	cursor: pointer;
 	background-size: 120px auto !important;
 }
+
+#cboxContent {
+	background-color: transparent;
+}
+
+#cboxPrevious, #cboxNext, #cboxSlideshow, #cboxClose {
+	background-image: url(https://raw.github.com/jackmoore/colorbox/master/example5/images/controls.png);
+}
