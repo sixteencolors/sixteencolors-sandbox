@@ -5,24 +5,27 @@ $(document).ready(function () {
 		, page = 1
 		, isLoading = false
 		, apiURL = 'http://api.sixteencolors.net/v0/'
+		, loadingBarWidth = 50
+		, cboxScrollJumpSize = 100
 		// layout options
 		, options = {
-			container: $("#pack_contents")
+			container: $('#pack_contents')
 			, gutter: 16
 			, columnWidth: 176
 		}
 	;
 
-	$(window).on("resize", function(){
-		//check if colorbox is open. This 'if' is from stackoverflow, I haven't tested
-		if($('#colorbox').length && $('#colorbox').css('display') != 'none') {
-			//replace colorboxID with the correct ID colorbox uses
-			document.getElementById('cboxContent').style.height=$(window).height();
-		}
-	});
+	// prev/next bindings
+	$('#cbox_prev').bind('click', $.colorbox.prev);
+	$('#cbox_next').bind('click', $.colorbox.next);
+
+	// handle window resizing
+	$(window).bind('resize', onResize);
+
+	// force resize event once
+	onResize();
 
 	// Lock body of page to not scroll
-
 	$(document).bind('cbox_open', function () {
 		$('html').css({ overflow: 'hidden' });
 	}).bind('cbox_closed', function () {
@@ -37,6 +40,7 @@ $(document).ready(function () {
 
 	// Load first data from the API.
 	if (! onHashChange()) {
+		// no hash passed; load default pack
 		loadData();
 	}
 
@@ -49,6 +53,11 @@ $(document).ready(function () {
 		clearProgress();
 
 		options.container.imagesLoaded(function (instance) {
+			var
+				msnry
+				, cboxFadeDuration = 200
+			;
+
 			$('#progress').hide();
 			$('#pack_contents ul').css('left', 'auto');
 
@@ -58,9 +67,9 @@ $(document).ready(function () {
 				, gutter: 16
 			});
 
-			var msnry = options.container.data('masonry');
+			msnry = options.container.data('masonry');
 
-			$('#pack_contents ul').css("text-indent", "auto");
+			$('#pack_contents ul').css('text-indent', 'auto');
 			// Create a new layout handler when images have loaded.
 			handler = $('#pack_contents ul li');
 
@@ -70,14 +79,57 @@ $(document).ready(function () {
 
 			$('a', handler).colorbox({
 				rel: 'lightbox'
+				, arrowKey: false
 				, photo: true
 				, opacity: 0.9
-				, height: $(window).height()
+				, height: '100%'
+				, maxWidth: '100%'
 				, scalePhotos: false
+				, transition: 'fade'
 				, title: function () {
 					return $(this).find('label span').html();
 				}
+				, onOpen: function () {
+					$(document).bind('keydown', onCboxKeyDown);
+				}
+				, onCleanup: function () {
+					$('#cbox_prev, #cbox_next').fadeOut(cboxFadeDuration);
+				}
+				, onClosed: function () {
+					$(document).unbind('keydown', onCboxKeyDown);
+				}
+				, onLoad: function () {
+					$('#cbox_prev, #cbox_next').fadeOut(cboxFadeDuration);
+				}
 				, onComplete: function () {
+					// resize window for scrollers
+					var
+						adjustment = 0
+						, content = $('#cboxLoadedContent')
+						, img = content.find('img')
+					;
+
+					content.data(null);
+
+					if (content.height() < img.height()
+						|| content.width() < img.width())
+					{
+						var boxheight = content.height();
+
+						if ($('#colorbox').width() + 20 > $(window).width()) {
+							$.colorbox.resize({ width: $(window).width(), height: '100%' });
+							content.data('wide-ansi', 1);
+						} else {
+							content
+								.each(function() { $(this).width($(this).width() + 20); })
+								.css({ 'margin-left': '-11px' })
+								.data('tall-ansi', 1)
+							;
+						}
+
+						adjustment = 10;
+					}
+
 					// block-shaded representation of image's position in pack
 					var
 						$cur = $('#cboxCurrent')
@@ -100,6 +152,29 @@ $(document).ready(function () {
 					}
 
 					$cur.html(bar + ' ' + prog[1] + '/' + prog[2]);
+
+					// prev/next images
+					var prev, next;
+
+					// prev: either prev or last in set
+					prev = $.colorbox.element().parent().prev('li').find('img');
+					if (prev.length == 0) prev = $('ul.pack li:last img');
+					// next: either next or first in set
+					next = $.colorbox.element().parent().next('li').find('img');
+					if (next.length == 0) next = $('ul.pack li:first img')
+					// set their background images/titles and show 'em
+					$('#cbox_prev')
+						.css({ background: 'url(' + prev.attr('src') + ')' })
+						.attr('title', 'Previous: ' + prev.siblings('label').find('span').html())
+					;
+					$('#cbox_next')
+						.css({ background: 'url(' + next.attr('src') + ')' })
+						.attr('title', 'Next: ' + next.siblings('label').find('span').html())
+					;
+					$('#cbox_prev, #cbox_next').fadeIn(200);
+					// recalculate prev/next alignment in case new image size is different than last
+					alignControls(adjustment);
+					console.log(content.data('wide-ansi'));
 				}
 			});
 
@@ -109,7 +184,7 @@ $(document).ready(function () {
 		})
 		.progress(function(instance, image) {
 			// block-shaded progress bar
-			var pct = Math.round(++howmany / instance.images.length * 50);
+			var pct = Math.round(++howmany / instance.images.length * loadingBarWidth);
 
 			if (image.isLoaded) {
 				var $which = $('#progress span:first');
@@ -127,25 +202,40 @@ $(document).ready(function () {
 
 	}
 
+	/**
+	 * Erase the loading bar to start again
+	 */
+
 	function clearProgress() {
 		var bar = '';
 
-		for (var a = 0; a < 50; a++) bar += '<span data-loaded="0">\xb0</span>';
+		for (var a = 0; a < loadingBarWidth; a++) bar += '<span data-loaded="0">\xb0</span>';
 		$('#progress').html(bar + '<br />Loading...');
 		$('html').css({ cursor: 'progress', overflow: 'hidden' });
 	}
+
+	/**
+	 * Pull pack data from API
+	 */
 
 	function loadData() {
 		isLoading = true;
 		$('#loaderCircle').show();
 
+		// stub data
+		// @DEBUG */ onLoadPack({"pack_file_location":"/static/packs/2003/27inch01.zip","files":[{"fullsize":"/pack/27inch01/27INCH.ANS/fullscale","thumbnail":"/pack/27inch01/27INCH.ANS/preview","filename":"27INCH.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/27INCH.ANS/download","uri":"/pack/27inch01/27INCH.ANS"},{"fullsize":"/pack/27inch01/27INFO.ANS/fullscale","thumbnail":"/pack/27inch01/27INFO.ANS/preview","filename":"27INFO.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/27INFO.ANS/download","uri":"/pack/27inch01/27INFO.ANS"},{"fullsize":"/pack/27inch01/43E0-IS.ANS/fullscale","thumbnail":"/pack/27inch01/43E0-IS.ANS/preview","filename":"43E0-IS.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/43E0-IS.ANS/download","uri":"/pack/27inch01/43E0-IS.ANS"},{"fullsize":"/pack/27inch01/AVG-27.ANS/fullscale","thumbnail":"/pack/27inch01/AVG-27.ANS/preview","filename":"AVG-27.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/AVG-27.ANS/download","uri":"/pack/27inch01/AVG-27.ANS"},{"fullsize":"/pack/27inch01/E0-COL1.ANS/fullscale","thumbnail":"/pack/27inch01/E0-COL1.ANS/preview","filename":"E0-COL1.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/E0-COL1.ANS/download","uri":"/pack/27inch01/E0-COL1.ANS"},{"fullsize":"/pack/27inch01/E0-OUTZ.ANS/fullscale","thumbnail":"/pack/27inch01/E0-OUTZ.ANS/preview","filename":"E0-OUTZ.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/E0-OUTZ.ANS/download","uri":"/pack/27inch01/E0-OUTZ.ANS"},{"fullsize":"/pack/27inch01/FILE_ID.DIZ/fullscale","thumbnail":"/pack/27inch01/FILE_ID.DIZ/preview","filename":"FILE_ID.DIZ","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/FILE_ID.DIZ/download","uri":"/pack/27inch01/FILE_ID.DIZ"},{"fullsize":"/pack/27inch01/QZE0-TSG.ANS/fullscale","thumbnail":"/pack/27inch01/QZE0-TSG.ANS/preview","filename":"QZE0-TSG.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/QZE0-TSG.ANS/download","uri":"/pack/27inch01/QZE0-TSG.ANS"},{"fullsize":"/pack/27inch01/TCF-PLAG.ANS/fullscale","thumbnail":"/pack/27inch01/TCF-PLAG.ANS/preview","filename":"TCF-PLAG.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/TCF-PLAG.ANS/download","uri":"/pack/27inch01/TCF-PLAG.ANS"},{"fullsize":"/pack/27inch01/TCF-RHN.ANS/fullscale","thumbnail":"/pack/27inch01/TCF-RHN.ANS/preview","filename":"TCF-RHN.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/TCF-RHN.ANS/download","uri":"/pack/27inch01/TCF-RHN.ANS"},{"fullsize":"/pack/27inch01/US-27I.ANS/fullscale","thumbnail":"/pack/27inch01/US-27I.ANS/preview","filename":"US-27I.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-27I.ANS/download","uri":"/pack/27inch01/US-27I.ANS"},{"fullsize":"/pack/27inch01/US-EXILE.ANS/fullscale","thumbnail":"/pack/27inch01/US-EXILE.ANS/preview","filename":"US-EXILE.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-EXILE.ANS/download","uri":"/pack/27inch01/US-EXILE.ANS"},{"fullsize":"/pack/27inch01/US-FLASH.ANS/fullscale","thumbnail":"/pack/27inch01/US-FLASH.ANS/preview","filename":"US-FLASH.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-FLASH.ANS/download","uri":"/pack/27inch01/US-FLASH.ANS"},{"fullsize":"/pack/27inch01/US-ROHAN.ANS/fullscale","thumbnail":"/pack/27inch01/US-ROHAN.ANS/preview","filename":"US-ROHAN.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-ROHAN.ANS/download","uri":"/pack/27inch01/US-ROHAN.ANS"},{"fullsize":"/pack/27inch01/US-SENSE.ANS/fullscale","thumbnail":"/pack/27inch01/US-SENSE.ANS/preview","filename":"US-SENSE.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-SENSE.ANS/download","uri":"/pack/27inch01/US-SENSE.ANS"},{"fullsize":"/pack/27inch01/US-TMNS.ANS/fullscale","thumbnail":"/pack/27inch01/US-TMNS.ANS/preview","filename":"US-TMNS.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-TMNS.ANS/download","uri":"/pack/27inch01/US-TMNS.ANS"}],"month":null,"name":"27inch01","uri":"/pack/27inch01","filename":"27inch01.zip","groups":[],"year":2003}); return;
+		
 		$.ajax({
-			url: apiURL + 'pack/' + pack,
-			dataType: 'jsonp',
-			// data: {page: page}, // Page parameter to make sure we load new data
-			success: onLoadPack
+			url: apiURL + 'pack/' + pack
+			, dataType: 'jsonp'
+			// , data: {page: page} // Page parameter to make sure we load new data
+			, success: onLoadPack
 		});
 	}
+
+	/**
+	 * Fill layout with HTML for pack
+	 */
 
 	function generatePackHtml(data) {
 		var html = '<h1>' + data.name + ', ' + data.year + '</h1>';
@@ -160,7 +250,7 @@ $(document).ready(function () {
 
 		for (; i < length; i++) {
 			image = data.files[i];
-			cssClass = "";
+			cssClass = '';
 
 			if (/\.bin/i.test(image.filename)) {
 				cssClass = 'bin';
@@ -182,11 +272,29 @@ $(document).ready(function () {
 	}
 
 	/**
+	 * Properly align the prev/next previews for the colorbox
+	 */
+
+	function alignControls(adjustment) {
+		// vertically center the next/prev elements
+		$('#cbox_prev, #cbox_next').css({
+			top: Math.round($(window).height() / 2) - Math.round($('#cbox_prev').height() / 2) + 'px'
+		});
+
+		// horizontally
+		$('#cbox_prev').css({
+			left: Math.round($(window).width() / 2 - $('#colorbox').width() / 2 - $('#cbox_prev').width() - (typeof adjustment == 'undefined' ? 0 : adjustment)) + 'px'
+		});
+		$('#cbox_next').css({ right: $('#cbox_prev').position().left + 'px' });
+	}
+
+	/**
 	 * When has changes, load a new pack
 	 */
 
 	function onHashChange (event) {
-		var hash = $(window.location).attr("hash").split('/');
+		var hash = $(window.location).attr('hash').split('/');
+		// @DEBUG */ hash = 'pack/27inch01';
 
 		if (hash.length > 1) {
 			pack = hash[1];
@@ -215,8 +323,20 @@ $(document).ready(function () {
 	}
 
 	/**
-	 * When scrolled all the way to the bottom, add more tiles.
+	 * Handle window resizing
 	 */
+
+	function onResize() {
+		// reload colorbox if currently shown
+		if($('#colorbox').length && $('#colorbox').css('display') != 'none') {
+			var el = $.colorbox.element();
+			$(el).click();
+		}
+	}
+
+	/**
+	 * When scrolled all the way to the bottom, add more tiles.
+	 **
 
 	function onScroll(event) {
 		// Only check when we're not still waiting for data.
@@ -228,5 +348,95 @@ $(document).ready(function () {
 				loadData();
 			}
 		}
+	}
+	*/
+
+	/*** colorbox navigation shortcut keys ***/
+
+	/**
+	 * Key pressed
+	 */
+
+	function onCboxKeyDown (e) {
+		var keycode = (e.keyCode || e.which);
+
+		switch (keycode) {
+			case 37:
+				onCboxLeft();
+				return false;
+				break;
+			case 38:
+				onCboxUp();
+				return false;
+				break;
+			case 39:
+				onCboxRight();
+				return false;
+				break;
+			case 40:
+				onCboxDown();
+				return false;
+				break;
+			default:
+				break;
+		}
+	}
+
+	/**
+	 * Down arrow
+	 */
+	
+	function onCboxDown() {
+		var content = $("#cboxLoadedContent");
+		content.scrollTop(content.scrollTop() + cboxScrollJumpSize);
+	}
+
+	/**
+	 * Up arrow
+	 */
+
+	function onCboxUp() {
+		var content = $("#cboxLoadedContent");
+		content.scrollTop(content.scrollTop() - cboxScrollJumpSize);
+	}
+
+	/**
+	 * Left arrow
+	 */
+	
+	function onCboxLeft() {
+		var content = $("#cboxLoadedContent");
+
+		// if it's a wide ansi, determine if we scroll or go to the previous image
+		if (content.data('wide-ansi')) {
+			var sl = content.scrollLeft();
+
+			if (sl > 0) {
+				content.scrollLeft(sl  - cboxScrollJumpSize);
+				return;
+			}
+		}
+
+		$.colorbox.prev();
+	}
+
+	/**
+	 * Right arrow
+	 */
+
+	function onCboxRight() {
+		var content = $("#cboxLoadedContent");
+
+		// if it's a wide ansi, determine if we scroll or go to the next image
+		if (content.data('wide-ansi')) {
+			var sl = content.scrollLeft();
+
+			if (sl < content[0].scrollLeftMax) {
+				content.scrollLeft(sl + cboxScrollJumpSize);
+				return;
+			}
+		}
+
+		$.colorbox.next();
 	}
 });

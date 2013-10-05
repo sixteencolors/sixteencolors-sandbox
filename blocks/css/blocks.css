@@ -131,3 +131,22 @@ label span {
 	top: 0;
 	width: 370px;
 }
+
+#cbox_prev, #cbox_next {
+	height: 120px;
+	width: 120px;
+	overflow: hidden;
+	position: fixed;
+	z-index: 999999;
+	display: none;
+	cursor: pointer;
+	background-size: 120px auto !important;
+}
+
+#cboxContent {
+	background-color: transparent;
+}
+
+#cboxPrevious, #cboxNext, #cboxSlideshow, #cboxClose {
+	background-image: url(https://raw.github.com/jackmoore/colorbox/master/example5/images/controls.png);
+}
