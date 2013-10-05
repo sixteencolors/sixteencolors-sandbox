@@ -72,6 +72,7 @@ $(document).ready(function () {
 
 			$('a', handler).colorbox({
 				rel: 'lightbox'
+				, arrowKey: false
 				, photo: true
 				, opacity: 0.9
 				, height: '100%'
@@ -81,26 +82,42 @@ $(document).ready(function () {
 				, title: function () {
 					return $(this).find('label span').html();
 				}
-				, onLoad: function () {
+				, onOpen: function () {
+					$(document).bind('keydown', onCboxKeyDown);
+				}
+				, onCleanup: function () {
 					$('#cbox_prev, #cbox_next').fadeOut(200);
 				}
-				, onCleanup: function() {
+				, onClosed: function () {
+					$(document).unbind('keydown', onCboxKeyDown);
+				}
+				, onLoad: function () {
 					$('#cbox_prev, #cbox_next').fadeOut(200);
 				}
 				, onComplete: function () {
 					// resize window for scrollers
-					var adjustment = 0;
+					var
+						adjustment = 0
+						, content = $('#cboxLoadedContent')
+						, img = content.find('img')
+					;
 
-					if ($('#cboxLoadedContent').height() < $('#cboxLoadedContent img').height()) {
-						var boxheight = $('#cboxLoadedContent').height();
+					content.data(null);
+
+					if (content.height() < img.height()
+						|| content.width() < img.width())
+					{
+						var boxheight = content.height();
 
 						if ($('#colorbox').width() + 20 > $(window).width()) {
 							$.colorbox.resize({ width: $(window).width(), height: '100%' });
+							content.data('wide-ansi', 1);
 						} else {
 							//$.colorbox.resize({ innerWidth: $('#cboxLoadedContent img').width() + 20, height: '100%' });
-							$('#cboxLoadedContent')
+							content
 								.each(function() { $(this).width($(this).width() + 20); })
 								.css({ 'margin-left': '-11px' })
+								.data('tall-ansi', 1)
 							;
 						}
 
@@ -151,6 +168,7 @@ $(document).ready(function () {
 					$('#cbox_prev, #cbox_next').fadeIn(200);
 					// recalculate prev/next alignment in case new image size is different than last
 					alignControls(adjustment);
+					console.log(content.data('wide-ansi'));
 				}
 			});
 
@@ -191,7 +209,7 @@ $(document).ready(function () {
 		$('#loaderCircle').show();
 
 		// stub data
-		/* @DEBUG */ onLoadPack({"pack_file_location":"/static/packs/2003/27inch01.zip","files":[{"fullsize":"/pack/27inch01/27INCH.ANS/fullscale","thumbnail":"/pack/27inch01/27INCH.ANS/preview","filename":"27INCH.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/27INCH.ANS/download","uri":"/pack/27inch01/27INCH.ANS"},{"fullsize":"/pack/27inch01/27INFO.ANS/fullscale","thumbnail":"/pack/27inch01/27INFO.ANS/preview","filename":"27INFO.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/27INFO.ANS/download","uri":"/pack/27inch01/27INFO.ANS"},{"fullsize":"/pack/27inch01/43E0-IS.ANS/fullscale","thumbnail":"/pack/27inch01/43E0-IS.ANS/preview","filename":"43E0-IS.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/43E0-IS.ANS/download","uri":"/pack/27inch01/43E0-IS.ANS"},{"fullsize":"/pack/27inch01/AVG-27.ANS/fullscale","thumbnail":"/pack/27inch01/AVG-27.ANS/preview","filename":"AVG-27.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/AVG-27.ANS/download","uri":"/pack/27inch01/AVG-27.ANS"},{"fullsize":"/pack/27inch01/E0-COL1.ANS/fullscale","thumbnail":"/pack/27inch01/E0-COL1.ANS/preview","filename":"E0-COL1.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/E0-COL1.ANS/download","uri":"/pack/27inch01/E0-COL1.ANS"},{"fullsize":"/pack/27inch01/E0-OUTZ.ANS/fullscale","thumbnail":"/pack/27inch01/E0-OUTZ.ANS/preview","filename":"E0-OUTZ.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/E0-OUTZ.ANS/download","uri":"/pack/27inch01/E0-OUTZ.ANS"},{"fullsize":"/pack/27inch01/FILE_ID.DIZ/fullscale","thumbnail":"/pack/27inch01/FILE_ID.DIZ/preview","filename":"FILE_ID.DIZ","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/FILE_ID.DIZ/download","uri":"/pack/27inch01/FILE_ID.DIZ"},{"fullsize":"/pack/27inch01/QZE0-TSG.ANS/fullscale","thumbnail":"/pack/27inch01/QZE0-TSG.ANS/preview","filename":"QZE0-TSG.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/QZE0-TSG.ANS/download","uri":"/pack/27inch01/QZE0-TSG.ANS"},{"fullsize":"/pack/27inch01/TCF-PLAG.ANS/fullscale","thumbnail":"/pack/27inch01/TCF-PLAG.ANS/preview","filename":"TCF-PLAG.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/TCF-PLAG.ANS/download","uri":"/pack/27inch01/TCF-PLAG.ANS"},{"fullsize":"/pack/27inch01/TCF-RHN.ANS/fullscale","thumbnail":"/pack/27inch01/TCF-RHN.ANS/preview","filename":"TCF-RHN.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/TCF-RHN.ANS/download","uri":"/pack/27inch01/TCF-RHN.ANS"},{"fullsize":"/pack/27inch01/US-27I.ANS/fullscale","thumbnail":"/pack/27inch01/US-27I.ANS/preview","filename":"US-27I.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-27I.ANS/download","uri":"/pack/27inch01/US-27I.ANS"},{"fullsize":"/pack/27inch01/US-EXILE.ANS/fullscale","thumbnail":"/pack/27inch01/US-EXILE.ANS/preview","filename":"US-EXILE.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-EXILE.ANS/download","uri":"/pack/27inch01/US-EXILE.ANS"},{"fullsize":"/pack/27inch01/US-FLASH.ANS/fullscale","thumbnail":"/pack/27inch01/US-FLASH.ANS/preview","filename":"US-FLASH.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-FLASH.ANS/download","uri":"/pack/27inch01/US-FLASH.ANS"},{"fullsize":"/pack/27inch01/US-ROHAN.ANS/fullscale","thumbnail":"/pack/27inch01/US-ROHAN.ANS/preview","filename":"US-ROHAN.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-ROHAN.ANS/download","uri":"/pack/27inch01/US-ROHAN.ANS"},{"fullsize":"/pack/27inch01/US-SENSE.ANS/fullscale","thumbnail":"/pack/27inch01/US-SENSE.ANS/preview","filename":"US-SENSE.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-SENSE.ANS/download","uri":"/pack/27inch01/US-SENSE.ANS"},{"fullsize":"/pack/27inch01/US-TMNS.ANS/fullscale","thumbnail":"/pack/27inch01/US-TMNS.ANS/preview","filename":"US-TMNS.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-TMNS.ANS/download","uri":"/pack/27inch01/US-TMNS.ANS"}],"month":null,"name":"27inch01","uri":"/pack/27inch01","filename":"27inch01.zip","groups":[],"year":2003}); return;
+		// @DEBUG */ onLoadPack({"pack_file_location":"/static/packs/2003/27inch01.zip","files":[{"fullsize":"/pack/27inch01/27INCH.ANS/fullscale","thumbnail":"/pack/27inch01/27INCH.ANS/preview","filename":"27INCH.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/27INCH.ANS/download","uri":"/pack/27inch01/27INCH.ANS"},{"fullsize":"/pack/27inch01/27INFO.ANS/fullscale","thumbnail":"/pack/27inch01/27INFO.ANS/preview","filename":"27INFO.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/27INFO.ANS/download","uri":"/pack/27inch01/27INFO.ANS"},{"fullsize":"/pack/27inch01/43E0-IS.ANS/fullscale","thumbnail":"/pack/27inch01/43E0-IS.ANS/preview","filename":"43E0-IS.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/43E0-IS.ANS/download","uri":"/pack/27inch01/43E0-IS.ANS"},{"fullsize":"/pack/27inch01/AVG-27.ANS/fullscale","thumbnail":"/pack/27inch01/AVG-27.ANS/preview","filename":"AVG-27.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/AVG-27.ANS/download","uri":"/pack/27inch01/AVG-27.ANS"},{"fullsize":"/pack/27inch01/E0-COL1.ANS/fullscale","thumbnail":"/pack/27inch01/E0-COL1.ANS/preview","filename":"E0-COL1.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/E0-COL1.ANS/download","uri":"/pack/27inch01/E0-COL1.ANS"},{"fullsize":"/pack/27inch01/E0-OUTZ.ANS/fullscale","thumbnail":"/pack/27inch01/E0-OUTZ.ANS/preview","filename":"E0-OUTZ.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/E0-OUTZ.ANS/download","uri":"/pack/27inch01/E0-OUTZ.ANS"},{"fullsize":"/pack/27inch01/FILE_ID.DIZ/fullscale","thumbnail":"/pack/27inch01/FILE_ID.DIZ/preview","filename":"FILE_ID.DIZ","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/FILE_ID.DIZ/download","uri":"/pack/27inch01/FILE_ID.DIZ"},{"fullsize":"/pack/27inch01/QZE0-TSG.ANS/fullscale","thumbnail":"/pack/27inch01/QZE0-TSG.ANS/preview","filename":"QZE0-TSG.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/QZE0-TSG.ANS/download","uri":"/pack/27inch01/QZE0-TSG.ANS"},{"fullsize":"/pack/27inch01/TCF-PLAG.ANS/fullscale","thumbnail":"/pack/27inch01/TCF-PLAG.ANS/preview","filename":"TCF-PLAG.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/TCF-PLAG.ANS/download","uri":"/pack/27inch01/TCF-PLAG.ANS"},{"fullsize":"/pack/27inch01/TCF-RHN.ANS/fullscale","thumbnail":"/pack/27inch01/TCF-RHN.ANS/preview","filename":"TCF-RHN.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/TCF-RHN.ANS/download","uri":"/pack/27inch01/TCF-RHN.ANS"},{"fullsize":"/pack/27inch01/US-27I.ANS/fullscale","thumbnail":"/pack/27inch01/US-27I.ANS/preview","filename":"US-27I.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-27I.ANS/download","uri":"/pack/27inch01/US-27I.ANS"},{"fullsize":"/pack/27inch01/US-EXILE.ANS/fullscale","thumbnail":"/pack/27inch01/US-EXILE.ANS/preview","filename":"US-EXILE.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-EXILE.ANS/download","uri":"/pack/27inch01/US-EXILE.ANS"},{"fullsize":"/pack/27inch01/US-FLASH.ANS/fullscale","thumbnail":"/pack/27inch01/US-FLASH.ANS/preview","filename":"US-FLASH.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-FLASH.ANS/download","uri":"/pack/27inch01/US-FLASH.ANS"},{"fullsize":"/pack/27inch01/US-ROHAN.ANS/fullscale","thumbnail":"/pack/27inch01/US-ROHAN.ANS/preview","filename":"US-ROHAN.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-ROHAN.ANS/download","uri":"/pack/27inch01/US-ROHAN.ANS"},{"fullsize":"/pack/27inch01/US-SENSE.ANS/fullscale","thumbnail":"/pack/27inch01/US-SENSE.ANS/preview","filename":"US-SENSE.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-SENSE.ANS/download","uri":"/pack/27inch01/US-SENSE.ANS"},{"fullsize":"/pack/27inch01/US-TMNS.ANS/fullscale","thumbnail":"/pack/27inch01/US-TMNS.ANS/preview","filename":"US-TMNS.ANS","pack":{"filename":"27inch01.zip","name":"27inch01","uri":"/pack/27inch01"},"file_location":"/pack/27inch01/US-TMNS.ANS/download","uri":"/pack/27inch01/US-TMNS.ANS"}],"month":null,"name":"27inch01","uri":"/pack/27inch01","filename":"27inch01.zip","groups":[],"year":2003}); return;
 		
 		$.ajax({
 			url: apiURL + 'pack/' + pack
@@ -254,7 +272,7 @@ $(document).ready(function () {
 
 	function onHashChange (event) {
 		var hash = $(window.location).attr('hash').split('/');
-		/* @DEBUG */ hash = 'pack/27inch01';
+		// @DEBUG */ hash = 'pack/27inch01';
 
 		if (hash.length > 1) {
 			pack = hash[1];
@@ -308,5 +326,94 @@ $(document).ready(function () {
 				loadData();
 			}
 		}
+	}
+
+	/*** colorbox navigation shortcut keys ***/
+
+	/**
+	 * Key pressed
+	 */
+
+	function onCboxKeyDown (e) {
+		var keycode = (e.keyCode || e.which);
+
+		switch (keycode) {
+			case 37:
+				onCboxLeft();
+				return false;
+				break;
+			case 38:
+				onCboxUp();
+				return false;
+				break;
+			case 39:
+				onCboxRight();
+				return false;
+				break;
+			case 40:
+				onCboxDown();
+				return false;
+				break;
+			default:
+				break;
+		}
+	}
+
+	/**
+	 * Down arrow
+	 */
+	
+	function onCboxDown() {
+		var content = $("#cboxLoadedContent");
+		content.scrollTop(content.scrollTop() + 100);
+	}
+
+	/**
+	 * Up arrow
+	 */
+
+	function onCboxUp() {
+		var content = $("#cboxLoadedContent");
+		content.scrollTop(content.scrollTop() - 100);
+	}
+
+	/**
+	 * Left arrow
+	 */
+	
+	function onCboxLeft() {
+		var content = $("#cboxLoadedContent");
+
+		// if it's a wide ansi, determine if we scroll or go to the previous image
+		if (content.data('wide-ansi')) {
+			var sl = content.scrollLeft();
+
+			if (sl > 0) {
+				content.scrollLeft(sl  - 100);
+				return;
+			}
+		}
+
+		$.colorbox.prev();
+	}
+
+	/**
+	 * Right arrow
+	 */
+
+	function onCboxRight() {
+		var content = $("#cboxLoadedContent");
+
+		// if it's a wide ansi, determine if we scroll or go to the next image
+		if (content.data('wide-ansi')) {
+			var sl = content.scrollLeft();
+
+			if (sl < content[0].scrollLeftMax) {
+				content.scrollLeft(sl + 100);
+				return;
+			}
+		}
+
+		$.colorbox.next();
 	}
 });
