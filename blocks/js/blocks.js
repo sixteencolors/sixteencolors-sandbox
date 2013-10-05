@@ -5,6 +5,8 @@ $(document).ready(function () {
 		, page = 1
 		, isLoading = false
 		, apiURL = 'http://api.sixteencolors.net/v0/'
+		, loadingBarWidth = 50
+		, cboxScrollJumpSize = 100
 		// layout options
 		, options = {
 			container: $('#pack_contents')
@@ -51,6 +53,11 @@ $(document).ready(function () {
 		clearProgress();
 
 		options.container.imagesLoaded(function (instance) {
+			var
+				msnry
+				, cboxFadeDuration = 200
+			;
+
 			$('#progress').hide();
 			$('#pack_contents ul').css('left', 'auto');
 
@@ -60,7 +67,7 @@ $(document).ready(function () {
 				, gutter: 16
 			});
 
-			var msnry = options.container.data('masonry');
+			msnry = options.container.data('masonry');
 
 			$('#pack_contents ul').css('text-indent', 'auto');
 			// Create a new layout handler when images have loaded.
@@ -86,13 +93,13 @@ $(document).ready(function () {
 					$(document).bind('keydown', onCboxKeyDown);
 				}
 				, onCleanup: function () {
-					$('#cbox_prev, #cbox_next').fadeOut(200);
+					$('#cbox_prev, #cbox_next').fadeOut(cboxFadeDuration);
 				}
 				, onClosed: function () {
 					$(document).unbind('keydown', onCboxKeyDown);
 				}
 				, onLoad: function () {
-					$('#cbox_prev, #cbox_next').fadeOut(200);
+					$('#cbox_prev, #cbox_next').fadeOut(cboxFadeDuration);
 				}
 				, onComplete: function () {
 					// resize window for scrollers
@@ -113,7 +120,6 @@ $(document).ready(function () {
 							$.colorbox.resize({ width: $(window).width(), height: '100%' });
 							content.data('wide-ansi', 1);
 						} else {
-							//$.colorbox.resize({ innerWidth: $('#cboxLoadedContent img').width() + 20, height: '100%' });
 							content
 								.each(function() { $(this).width($(this).width() + 20); })
 								.css({ 'margin-left': '-11px' })
@@ -178,7 +184,7 @@ $(document).ready(function () {
 		})
 		.progress(function(instance, image) {
 			// block-shaded progress bar
-			var pct = Math.round(++howmany / instance.images.length * 50);
+			var pct = Math.round(++howmany / instance.images.length * loadingBarWidth);
 
 			if (image.isLoaded) {
 				var $which = $('#progress span:first');
@@ -196,13 +202,21 @@ $(document).ready(function () {
 
 	}
 
+	/**
+	 * Erase the loading bar to start again
+	 */
+
 	function clearProgress() {
 		var bar = '';
 
-		for (var a = 0; a < 50; a++) bar += '<span data-loaded="0">\xb0</span>';
+		for (var a = 0; a < loadingBarWidth; a++) bar += '<span data-loaded="0">\xb0</span>';
 		$('#progress').html(bar + '<br />Loading...');
 		$('html').css({ cursor: 'progress', overflow: 'hidden' });
 	}
+
+	/**
+	 * Pull pack data from API
+	 */
 
 	function loadData() {
 		isLoading = true;
@@ -218,6 +232,10 @@ $(document).ready(function () {
 			, success: onLoadPack
 		});
 	}
+
+	/**
+	 * Fill layout with HTML for pack
+	 */
 
 	function generatePackHtml(data) {
 		var html = '<h1>' + data.name + ', ' + data.year + '</h1>';
@@ -252,6 +270,10 @@ $(document).ready(function () {
 		// Apply layout.
 		applyLayout();
 	}
+
+	/**
+	 * Properly align the prev/next previews for the colorbox
+	 */
 
 	function alignControls(adjustment) {
 		// vertically center the next/prev elements
@@ -314,7 +336,7 @@ $(document).ready(function () {
 
 	/**
 	 * When scrolled all the way to the bottom, add more tiles.
-	 */
+	 **
 
 	function onScroll(event) {
 		// Only check when we're not still waiting for data.
@@ -327,6 +349,7 @@ $(document).ready(function () {
 			}
 		}
 	}
+	*/
 
 	/*** colorbox navigation shortcut keys ***/
 
@@ -365,7 +388,7 @@ $(document).ready(function () {
 	
 	function onCboxDown() {
 		var content = $("#cboxLoadedContent");
-		content.scrollTop(content.scrollTop() + 100);
+		content.scrollTop(content.scrollTop() + cboxScrollJumpSize);
 	}
 
 	/**
@@ -374,7 +397,7 @@ $(document).ready(function () {
 
 	function onCboxUp() {
 		var content = $("#cboxLoadedContent");
-		content.scrollTop(content.scrollTop() - 100);
+		content.scrollTop(content.scrollTop() - cboxScrollJumpSize);
 	}
 
 	/**
@@ -389,7 +412,7 @@ $(document).ready(function () {
 			var sl = content.scrollLeft();
 
 			if (sl > 0) {
-				content.scrollLeft(sl  - 100);
+				content.scrollLeft(sl  - cboxScrollJumpSize);
 				return;
 			}
 		}
@@ -409,7 +432,7 @@ $(document).ready(function () {
 			var sl = content.scrollLeft();
 
 			if (sl < content[0].scrollLeftMax) {
-				content.scrollLeft(sl + 100);
+				content.scrollLeft(sl + cboxScrollJumpSize);
 				return;
 			}
 		}
