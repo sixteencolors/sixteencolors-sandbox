@@ -8,6 +8,8 @@
     <script src="js/imagesloaded.pkgd.min.js"></script>
     <script src="http://cdn.jsdelivr.net/colorbox/1.4.4/jquery.colorbox-min.js"></script>
     <script src="js/masonry.pkgd.min.js"></script>
+    <script src="js/knockout-3.1.0.js"></script>
+    <script src="js/knockout.mapping-latest.js"></script>
     <script src="js/blocks.js"></script>
     <link rel="stylesheet" type="text/css" href="css/colorbox.css"/>
     <link rel="stylesheet" type="text/css" href="css/blocks.css"/>
@@ -19,6 +21,16 @@
     <header>
         Sixteen Colors ANSI Art and ASCII Art Archive 
     </header>
-    <div id="pack_contents"></div>
+    <div id="pack_contents">
+        <h1><span class="filename" data-bind="text: name"></span>, <span class="year" data-bind="text: year"></span></h1>
+        <div id="progress"></div>
+        <img data-bind="attr: { src: thumbnail,  alt: name }" class="stamp" />
+        <ul class="pack" data-bind="foreach: files">            
+            <li>
+                <a data-bind="attr: { href: fullsize, title: name }"><img data-bind="attr: { src: thumbnail, alt: name }" /><label><span data-bind="text: filename"></span></label></a>
+            </li>
+        </ul>
+
+    </div>
 </body>
 </html>

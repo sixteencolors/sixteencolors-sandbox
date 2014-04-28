@@ -1,6 +1,48 @@
+var sourceUrl = 'http://sixteencolors.net';
+
+var fileMapping = {
+	'files': {
+		create: function(options) {
+			return new fileViewModel(options.data);
+		}
+	}
+}
+
+var mapping = {	
+	create: function(options) {
+		return new packViewModel(options.data);
+	}
+};
+
+
+var fileViewModel = function(data) {
+	ko.mapping.fromJS(data, fileMapping, this);
+
+	this.fullsize = ko.computed(prependDomain, this.fullsize());
+	this.thumbnail = ko.computed(prependDomain, this.thumbnail());
+};
+
+var packViewModel = function(data) {
+	ko.mapping.fromJS(data, fileMapping, this);
+	this.thumbnail = ko.computed(function() {
+		return sourceUrl + '/pack/' + this.name() + '/preview';
+	}, this);
+};
+
+
+
+function prependDomain() {
+	return sourceUrl + this;
+}
+
 $(document).ready(function () {
+
+
+
+	var pack;
+
 	var
-		pack = '27inch04'
+		packname = '27inch04'
 		, handler = null
 		, page = 1
 		, isLoading = false
@@ -140,7 +182,7 @@ $(document).ready(function () {
 		$('#loaderCircle').show();
 
 		$.ajax({
-			url: apiURL + 'pack/' + pack,
+			url: apiURL + 'pack/' + packname,
 			dataType: 'jsonp',
 			// data: {page: page}, // Page parameter to make sure we load new data
 			success: onLoadPack
@@ -189,12 +231,12 @@ $(document).ready(function () {
 		var hash = $(window.location).attr("hash").split('/');
 
 		if (hash.length > 1) {
-			pack = hash[1];
+			packname = hash[1];
 
 			// if there's masonry, tear it down first
 			if ($('#pack_contents h1').length > 0) {
 				options.container.masonry('destroy');
-				$('#pack_contents').html('');
+				// $('#pack_contents').html('');
 			}
 
 			loadData();
@@ -211,7 +253,21 @@ $(document).ready(function () {
 	function onLoadPack(data) {
 		isLoading = false;
 		$('#loaderCircle').hide();
-		generatePackHtml(data);
+
+		if (typeof pack == 'undefined') {
+			pack = ko.mapping.fromJS(data, mapping);
+
+
+
+			ko.applyBindings(pack);
+		}
+		else
+			ko.mapping.fromJS(data, pack);
+		
+		// Apply layout.
+		applyLayout();
+
+		// generatePackHtml(data);
 	}
 
 	/**
