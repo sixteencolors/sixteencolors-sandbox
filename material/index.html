@@ -1,0 +1,34 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Sixteen Colors</title>
+  <meta name="description" content="Sixteen Colors">
+  <meta name="author" content="Sixteen Colors">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="bundle.css">
+
+</head>
+
+<body>
+    <!-- ko if: loaded() -->
+    <h1 data-bind="text: results()[0].archive"></h1>
+    <ul class="mdc-image-list mdc-image-list--masonry pack-contents" data-bind="foreach: Object.keys(results()[0].files)">
+        <li class="md-image-list__item">
+            <!-- <div class="mdc-image-list__image-aspect-container"> -->
+                <img class="mdc-image-list__image" data-bind="attr: { src: 'https://16colo.rs/' + results()[0].files[$data].file.tn.uri(), width: results()[0].files[$data].file.tn.width(), height: results()[0].files[$data].file.tn.height() }" >
+            <!-- </div> -->
+            <div class="mdc-image-list__supporting">
+                <span class="mdc-image-list__label"data-bind="text: results()[0].files[$data].file.raw()"></span>
+            </div>
+        </li>
+    </ul>
+    <!-- /ko -->
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.js"></script>
+  <script src="js/bundle.js" async></script>
+  <script src="js/site.js" async></script>
+</body>
+</html>

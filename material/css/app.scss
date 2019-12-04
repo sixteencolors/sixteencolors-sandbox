@@ -1,0 +1,6 @@
+@import "@material/image-list/mdc-image-list";
+
+.pack-contents {
+    // @include mdc-image-list-standard-columns(2);
+    @include mdc-image-list-masonry-columns(5);
+}
